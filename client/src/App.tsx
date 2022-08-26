@@ -1,12 +1,18 @@
 
 import './App.css';
 import Container from '@mui/material/Container';
-import FinanceTable from './components/Table/FinanceTable';
+import { useGetDataQuery } from './redux/financeAPI';
+import FinanceTable from './components/FinanceTable/FinanceTable';
+
 
 function App() {
+
+   const { data, isSuccess } = useGetDataQuery();
+
+  
   return (
     <Container>
-     <FinanceTable/>
+      {isSuccess && <FinanceTable data={data} />}
     </Container>
   );
 }

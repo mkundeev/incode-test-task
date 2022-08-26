@@ -1,0 +1,23 @@
+.headerCell{
+    cursor:pointer;
+    position: relative;
+}
+.headerCell:hover{
+    background-color: rgba(220, 215, 237, 0.318);
+ 
+}
+.headerCell:hover::after {
+    content: "";
+    position: absolute;
+    background-color:rgba(240, 232, 232, 0.318);
+   
+    left: 0;
+    top: -5000px;
+    height: 10000px;
+    width: 100%;
+    z-index: 1;
+}
+
+.table{
+        overflow: hidden;
+    }
