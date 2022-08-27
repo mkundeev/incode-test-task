@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {  useState, useEffect } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -9,58 +9,26 @@ import Paper from '@mui/material/Paper';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Checkbox from '@mui/material/Checkbox';
-import { useState, useEffect } from 'react';
-
+import {useSendTickersMutation  } from '../../redux/financeAPI'
+import { changeColororOnValue, dateToLocalTime } from '../../utils/data-formatin';
+import { filterInitState } from '../../utils/fiter-init-state';
 import s from './FinanceTable.module.css'
 
 
-const changeColororOnValue = (value:number) => {
- return value<0?{ color: 'red'}:{ color: 'green'}
-}
-const dateToLocalTime = (date: string): string => {
-  const newDate = new Date(date);
-  return newDate.toLocaleTimeString()
-}
-
 export default function FinanceTable({ data }) {
-  
-  const [amountSort, setAmountSort] = useState({});
-  const [dateSort, setDateSort] = useState(true);
- const [tickersFilter, setTickersFilter] = useState([]);
+  const anchorCategory = document.querySelector('#filtrTicker');
+  const [sendTickers]=useSendTickersMutation()
+  const [amountSort, setAmountSort] = useState({})
+ const [tickersFilter, setTickersFilter] = useState(filterInitState);
+  const [transactions, setTransactions] = useState([]);
 
   const [isMenuTickerOpen, setIsMenuTickerOpen] = useState(false);
-  const [transactions, setTransactions] = useState([]);
  
-
   useEffect(() => {
-    setTickersFilter(
-      [...data]
-      .map(({ ticker }) => {return {[ticker]:false}})
-  );
-    setTransactions([...data]);
+    setTransactions(data);
   }, [data]);
 
 
-  const sortByDate = () => {
-    let filterdTransactions = [];
-    if (dateSort) {
-      filterdTransactions = [...data].sort((a, b) => {
-        const newDateA = new Date(a.date);
-        const newDateB = new Date(b.date);
-        return newDateB - newDateA;
-      });
-      setDateSort(!dateSort);
-    } else {
-      filterdTransactions = [...data].sort((a, b) => {
-        const newDateA = new Date(a.date);
-        const newDateB = new Date(b.date);
-        return newDateA - newDateB;
-      });
-      setDateSort(!dateSort);
-    }
-
-    setTransactions(filterdTransactions);
-  };
 
   const sortByAmount = (property:string) => {
     let filterdTransactions = [];
@@ -82,41 +50,40 @@ export default function FinanceTable({ data }) {
     setTransactions(filterdTransactions);
   };
 
-    const filterByTickers = () => {
-    const filterValues = tickersFilter.filter(obj => Object.values(obj)[0]).reduce((acc, obj) => { acc.push(Object.keys(obj)[0]);
-      return acc
-    }, [])
-      if (filterValues.length < 1) {
-        return
-      }
 
-   const filteredTransactions= data.filter(obj=>filterValues.includes(obj.ticker))
-    setTransactions(filteredTransactions)
-  }
-
-  const handleSetTickersFilter = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTickersFilter(
-      tickersFilter.map((obj) =>
-      {
-        if (obj.hasOwnProperty(event.target.name)) {
-          obj[event.target.name] = event.target.checked
+   const handleSetTickersFilter = (event: React.ChangeEvent<HTMLInputElement>) => {
+   const newFiltervalue=tickersFilter.map((obj) =>
+   {
+     if (obj.hasOwnProperty(event.target.name)) {
+         obj[event.target.name] = event.target.checked
           return obj
         }
         return obj
       }
-      )
     )
+      setTickersFilter(newFiltervalue)
   };
-  
 
- const anchorCategory = document.querySelector('#filtrTicker');
+  const filterByTickers = async () => {
+    if (tickersFilter.filter((obj) => Object.values(obj)[0]) === 0) {
+      return
+    }
+    await sendTickers(tickersFilter);
+    setIsMenuTickerOpen(false);
+  }
+
+  const handleResetTickers = async () => {
+    setTickersFilter(filterInitState)
+  }
+
+
 
   return (
     <div>
       <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650}} padding='normal' size="small" aria-label="simple table" className={s.table}>
         <TableHead>
-          <TableRow>
+          <TableRow >
             <TableCell className={s.headerCell} id="filtrTicker" onClick={() => {
                 setIsMenuTickerOpen(true);
               }}>Ticker</TableCell>
@@ -126,7 +93,7 @@ export default function FinanceTable({ data }) {
             <TableCell align='center' className={s.headerCell}onClick={() => sortByAmount('change_percent')}>Change persent</TableCell>
             <TableCell align='center'  className={s.headerCell}onClick={() => sortByAmount('dividend')}>Devident</TableCell>
             <TableCell align='center' className={s.headerCell}onClick={() => sortByAmount('yield')}>Yield</TableCell>
-            <TableCell align='center' className={s.headerCell}onClick={sortByDate}><p>Last trade time on</p><p>{data[0]?.last_trade_time.slice(0,10)}</p></TableCell>
+            <TableCell align='center' ><p>Last trade time on</p><p>{data[0]?.last_trade_time.slice(0,10)}</p></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -135,6 +102,7 @@ export default function FinanceTable({ data }) {
               key={row.ticker}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               role="checkbox"
+              className={s.tableRow}
             >
               <TableCell component="th" scope="row">
                 {row.ticker}
@@ -156,7 +124,9 @@ export default function FinanceTable({ data }) {
         anchorEl={anchorCategory}
         autoFocus={false}
         open={isMenuTickerOpen}
-        onClose={() => setIsMenuTickerOpen(false)}
+        onClose={() => {
+          setIsMenuTickerOpen(false)
+        handleResetTickers()}}
         MenuListProps={{
           'aria-labelledby': 'basic-button',
         }}
@@ -175,21 +145,14 @@ export default function FinanceTable({ data }) {
           </MenuItem>
         ))}
         <MenuItem
-          onClick={() => {
-           filterByTickers()
-            setIsMenuTickerOpen(false);
-          }}
+          onClick={filterByTickers}
           key="filter"
           sx={{ fontSize: '14px', justifyContent: 'center'  }}
         >
           Filter
         </MenuItem>
         <MenuItem
-          onClick={() => {
-           setTickersFilter([...data]
-             .map(({ ticker }) => { return { [ticker]: false } }))
-            setTransactions([...data])
-          }}
+          onClick={handleResetTickers}
           key="reset"
           sx={{ fontSize: '14px', justifyContent: 'center' }}
         >

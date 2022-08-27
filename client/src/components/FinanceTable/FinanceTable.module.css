@@ -21,3 +21,7 @@
 .table{
         overflow: hidden;
     }
+
+.tableRow:nth-child(2n+1){
+    background-color: rgb(222, 231, 231);
+}

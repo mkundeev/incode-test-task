@@ -7,12 +7,11 @@ import FinanceTable from './components/FinanceTable/FinanceTable';
 
 function App() {
 
-   const { data, isSuccess } = useGetDataQuery();
+   const { data, isLoading } = useGetDataQuery();
 
-  
   return (
     <Container>
-      {isSuccess && <FinanceTable data={data} />}
+      {!isLoading && <FinanceTable data={data} />}
     </Container>
   );
 }
