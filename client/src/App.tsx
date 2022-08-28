@@ -7,7 +7,8 @@ import FinanceTable from './components/FinanceTable/FinanceTable';
 
 function App() {
 
-   const { data, isLoading } = useGetDataQuery();
+  const { data, isLoading} = useGetDataQuery();
+
 
   return (
     <Container>

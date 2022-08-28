@@ -18,10 +18,10 @@ export const financeAPI = createApi({
           const socket = io("http://localhost:4000");
           socket.emit("start");
           socket.on("ticker", function (response) {
-            const res = Array.isArray(response) ? response : [response];
+           
 
             updateCachedData((draft: any[]): any => {
-              draft = res;
+              draft = response;
               return draft;
             });
           });
@@ -41,17 +41,10 @@ export const financeAPI = createApi({
         });
         },
     }),
-    getTickers: builder.query({
-      query: () => ({
-        url: `/tickers`,
-      }),
-      providesTags: ["Tickers"],
-    }),
   }),
 });
 
 export const {
   useGetDataQuery,
-  useLazyGetTickersQuery,
   useSendTickersMutation,
 } = financeAPI;

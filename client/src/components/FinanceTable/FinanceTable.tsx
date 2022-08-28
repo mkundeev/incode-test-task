@@ -1,4 +1,6 @@
-import React, {  useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { getTickersFilter } from '../../redux/selectors';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -11,24 +13,36 @@ import MenuItem from '@mui/material/MenuItem';
 import Checkbox from '@mui/material/Checkbox';
 import {useSendTickersMutation  } from '../../redux/financeAPI'
 import { changeColororOnValue, dateToLocalTime } from '../../utils/data-formatin';
-import { filterInitState } from '../../utils/fiter-init-state';
 import s from './FinanceTable.module.css'
+import { setTrikersFilterReducer } from '../../redux/reducer';
 
 
 export default function FinanceTable({ data }) {
+  
+
+
   const anchorCategory = document.querySelector('#filtrTicker');
+
   const [sendTickers]=useSendTickersMutation()
-  const [amountSort, setAmountSort] = useState({})
- const [tickersFilter, setTickersFilter] = useState(filterInitState);
-  const [transactions, setTransactions] = useState([]);
+  const [amountSort, setAmountSort] = useState({});
+  const [localFilter, setLocalFilter] = useState([]);
+
+  const [tickersFilter, setTickersFilter] = useState([]);
+
+ 
+  const [transactions, setTransactions] = useState(data);
 
   const [isMenuTickerOpen, setIsMenuTickerOpen] = useState(false);
- 
+
+
   useEffect(() => {
-    setTransactions(data);
+    
+    const initialFilterState = JSON.parse(localStorage.getItem('tickers'))
+    if (initialFilterState) setTickersFilter(initialFilterState)
+
+ setTransactions(data)
+
   }, [data]);
-
-
 
   const sortByAmount = (property:string) => {
     let filterdTransactions = [];
@@ -51,7 +65,8 @@ export default function FinanceTable({ data }) {
   };
 
 
-   const handleSetTickersFilter = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSetTickersFilter = (event: React.ChangeEvent<HTMLInputElement>) => {
+    
    const newFiltervalue=tickersFilter.map((obj) =>
    {
      if (obj.hasOwnProperty(event.target.name)) {
@@ -61,39 +76,67 @@ export default function FinanceTable({ data }) {
         return obj
       }
     )
-      setTickersFilter(newFiltervalue)
+     localStorage.setItem('tickers', JSON.stringify(newFiltervalue))
+      setLocalFilter(newFiltervalue)
+   
+     
   };
 
   const filterByTickers = async () => {
-    if (tickersFilter.filter((obj) => Object.values(obj)[0]) === 0) {
+   
+    if (tickersFilter.filter((obj) => Object.values(obj)[0]).length === 0) {
       return
     }
-    await sendTickers(tickersFilter);
+    const { data } = await sendTickers(tickersFilter);
+    setTransactions(data);
     setIsMenuTickerOpen(false);
+   
   }
+
+
 
   const handleResetTickers = async () => {
-    setTickersFilter(filterInitState)
+  localStorage.setItem('tickers', JSON.stringify([
+  { AAPL: false },
+  { GOOGL: false },
+  { MSFT: false },
+  { AMZN: false },
+  { FB: false },
+  { TSLA: false },
+  ]))
+    
+   const { data } =  await sendTickers([
+  { AAPL: true},
+  { GOOGL: true },
+  { MSFT: true },
+  { AMZN: true },
+  { FB: true},
+  { TSLA: true },
+    ]);
+    setTransactions(data); 
+    const checkedBoxsEls = document.querySelectorAll('.checkdox');
+    checkedBoxsEls.forEach(el => {
+      // el.childNodes[0].checked = false;
+      console.log(el.childNodes[0].checked)
+    }) 
   }
 
-
-
   return (
-    <div>
+    <div className={s.container}>
       <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650}} padding='normal' size="small" aria-label="simple table" className={s.table}>
-        <TableHead>
-          <TableRow >
-            <TableCell className={s.headerCell} id="filtrTicker" onClick={() => {
+        <TableHead >
+          <TableRow className={s.headerRow}>
+            <TableCell sx={{cursor:'pointer'}} className={s.headerCell} id="filtrTicker" onClick={() => {
                 setIsMenuTickerOpen(true);
               }}>Ticker</TableCell>
-            <TableCell align='center'>Exchange</TableCell>
-            <TableCell align='center'className={s.headerCell} onClick={()=>sortByAmount('price')}>Price</TableCell>
-            <TableCell align='center' className={s.headerCell}onClick={() => sortByAmount('change')}>Change</TableCell>
-            <TableCell align='center' className={s.headerCell}onClick={() => sortByAmount('change_percent')}>Change persent</TableCell>
-            <TableCell align='center'  className={s.headerCell}onClick={() => sortByAmount('dividend')}>Devident</TableCell>
-            <TableCell align='center' className={s.headerCell}onClick={() => sortByAmount('yield')}>Yield</TableCell>
-            <TableCell align='center' ><p>Last trade time on</p><p>{data[0]?.last_trade_time.slice(0,10)}</p></TableCell>
+            <TableCell align='center'  className={s.headerCell}>Exchange</TableCell>
+            <TableCell align='center'sx={{cursor:'pointer'}} className={s.headerCell} onClick={()=>sortByAmount('price')}>Price</TableCell>
+            <TableCell align='center' sx={{cursor:'pointer'}} className={s.headerCell} onClick={() => sortByAmount('change')}>Change</TableCell>
+            <TableCell align='center' sx={{cursor:'pointer'}} className={s.headerCell} onClick={() => sortByAmount('change_percent')}>Change persent</TableCell>
+            <TableCell align='center' sx={{cursor:'pointer'}} className={s.headerCell} onClick={() => sortByAmount('dividend')}>Devident</TableCell>
+            <TableCell align='center' sx={{cursor:'pointer'}} className={s.headerCell} onClick={() => sortByAmount('yield')}>Yield</TableCell>
+            <TableCell align='center' className={s.headerCell} ><p>Last trade time on</p><p>{data[0]?.last_trade_time.slice(0,10)}</p></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -139,7 +182,8 @@ export default function FinanceTable({ data }) {
           ><Checkbox
       checked={Object.values(el)[0]}
       onChange={handleSetTickersFilter}
-      name={Object.keys(el)[0]}
+              name={Object.keys(el)[0]}
+              className='checkdox'
     />
             {Object.keys(el)[0]}
           </MenuItem>

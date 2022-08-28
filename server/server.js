@@ -93,8 +93,24 @@ socketServer.on("connection", (socket) => {
   });
   socket.on("changeTickers", (arg, callback) => {
     tickers = arg;
-    getQuotes(socket);
-    callback(arg);
+    const quotes = tickers
+      .filter((obj) => Object.values(obj)[0])
+      .map((ticker) => {
+        const price = randomValue(100, 300, 2);
+        const change = randomValue(-10, 20, 2);
+        const change_percent = Number(((change * 100) / price).toFixed(2));
+        return {
+          ticker: Object.keys(ticker)[0],
+          exchange: "NASDAQ",
+          price,
+          change,
+          change_percent,
+          dividend: randomValue(0, 1, 2),
+          yield: randomValue(0, 2, 2),
+          last_trade_time: utcDate(),
+        };
+      });
+    callback(quotes);
   });
 });
 

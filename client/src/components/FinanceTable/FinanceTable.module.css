@@ -1,15 +1,21 @@
+.container{
+    padding: 20px;
+}
+.headerRow .headerCell{
+    font-weight: 700;
+}
 .headerCell{
-    cursor:pointer;
     position: relative;
+   
 }
 .headerCell:hover{
-    background-color: rgba(220, 215, 237, 0.318);
+    background-color: rgba(207, 244, 215, 0.318);
  
 }
 .headerCell:hover::after {
     content: "";
     position: absolute;
-    background-color:rgba(240, 232, 232, 0.318);
+    background-color: rgba(207, 244, 215, 0.318);
    
     left: 0;
     top: -5000px;
