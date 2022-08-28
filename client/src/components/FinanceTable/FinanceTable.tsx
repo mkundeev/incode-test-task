@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { getTickersFilter } from '../../redux/selectors';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -14,7 +12,7 @@ import Checkbox from '@mui/material/Checkbox';
 import {useSendTickersMutation  } from '../../redux/financeAPI'
 import { changeColororOnValue, dateToLocalTime } from '../../utils/data-formatin';
 import s from './FinanceTable.module.css'
-import { setTrikersFilterReducer } from '../../redux/reducer';
+
 
 
 export default function FinanceTable({ data }) {
@@ -26,12 +24,8 @@ export default function FinanceTable({ data }) {
   const [sendTickers]=useSendTickersMutation()
   const [amountSort, setAmountSort] = useState({});
   const [localFilter, setLocalFilter] = useState([]);
-
   const [tickersFilter, setTickersFilter] = useState([]);
-
- 
   const [transactions, setTransactions] = useState(data);
-
   const [isMenuTickerOpen, setIsMenuTickerOpen] = useState(false);
 
 
@@ -42,7 +36,7 @@ export default function FinanceTable({ data }) {
 
  setTransactions(data)
 
-  }, [data]);
+  }, [data, localFilter]);
 
   const sortByAmount = (property:string) => {
     let filterdTransactions = [];
@@ -78,8 +72,6 @@ export default function FinanceTable({ data }) {
     )
      localStorage.setItem('tickers', JSON.stringify(newFiltervalue))
       setLocalFilter(newFiltervalue)
-   
-     
   };
 
   const filterByTickers = async () => {
@@ -92,9 +84,6 @@ export default function FinanceTable({ data }) {
     setIsMenuTickerOpen(false);
    
   }
-
-
-
   const handleResetTickers = async () => {
   localStorage.setItem('tickers', JSON.stringify([
   { AAPL: false },
@@ -104,8 +93,15 @@ export default function FinanceTable({ data }) {
   { FB: false },
   { TSLA: false },
   ]))
-    
-   const { data } =  await sendTickers([
+  setLocalFilter([
+  { AAPL: false },
+  { GOOGL: false },
+  { MSFT: false },
+  { AMZN: false },
+  { FB: false },
+  { TSLA: false },
+  ])  
+   await sendTickers([
   { AAPL: true},
   { GOOGL: true },
   { MSFT: true },
@@ -113,12 +109,7 @@ export default function FinanceTable({ data }) {
   { FB: true},
   { TSLA: true },
     ]);
-    setTransactions(data); 
-    const checkedBoxsEls = document.querySelectorAll('.checkdox');
-    checkedBoxsEls.forEach(el => {
-      // el.childNodes[0].checked = false;
-      console.log(el.childNodes[0].checked)
-    }) 
+   
   }
 
   return (
@@ -167,9 +158,9 @@ export default function FinanceTable({ data }) {
         anchorEl={anchorCategory}
         autoFocus={false}
         open={isMenuTickerOpen}
-        onClose={() => {
+        onClose={() => 
           setIsMenuTickerOpen(false)
-        handleResetTickers()}}
+        }
         MenuListProps={{
           'aria-labelledby': 'basic-button',
         }}
