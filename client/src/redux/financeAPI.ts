@@ -1,12 +1,13 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { io } from "socket.io-client";
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { io } from 'socket.io-client';
+import { tikersType, tikersFilterType } from '../utils/ts-types';
 export const financeAPI = createApi({
-  reducerPath: "finaceAPI",
+  reducerPath: 'finaceAPI',
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:4000",
+    baseUrl: 'http://localhost:4000',
   }),
-  tagTypes: ["Tickers"],
-  endpoints: (builder) => ({
+  tagTypes: ['Tickers'],
+  endpoints: builder => ({
     getData: builder.query({
       queryFn: () => ({ data: [] }),
       async onCacheEntryAdded(
@@ -15,12 +16,10 @@ export const financeAPI = createApi({
       ) {
         try {
           await cacheDataLoaded;
-          const socket = io("http://localhost:4000");
-          socket.emit("start");
-          socket.on("ticker", function (response) {
-           
-
-            updateCachedData((draft: any[]): any => {
+          const socket = io('http://localhost:4000');
+          socket.emit('start');
+          socket.on('ticker', function (response) {
+            updateCachedData(draft => {
               draft = response;
               return draft;
             });
@@ -32,19 +31,20 @@ export const financeAPI = createApi({
       },
     }),
     sendTickers: builder.mutation({
-      queryFn: (tickers) => {
-        const socket = io("http://localhost:4000");
-        return new Promise((resolve) => {
-          socket.emit("changeTickers", tickers, (response) => {
-            resolve({ data: response });
-          });
+      queryFn: (tickersFilter: tikersFilterType) => {
+        const socket = io('http://localhost:4000');
+        return new Promise(resolve => {
+          socket.emit(
+            'changeTickers',
+            tickersFilter,
+            (response: tikersType[]) => {
+              resolve({ data: response });
+            }
+          );
         });
-        },
+      },
     }),
   }),
 });
 
-export const {
-  useGetDataQuery,
-  useSendTickersMutation,
-} = financeAPI;
+export const { useGetDataQuery, useSendTickersMutation } = financeAPI;

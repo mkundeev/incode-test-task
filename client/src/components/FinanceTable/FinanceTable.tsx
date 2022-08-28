@@ -9,158 +9,204 @@ import Paper from '@mui/material/Paper';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Checkbox from '@mui/material/Checkbox';
-import {useSendTickersMutation  } from '../../redux/financeAPI'
-import { changeColororOnValue, dateToLocalTime } from '../../utils/data-formatin';
-import s from './FinanceTable.module.css'
-
-
+import { useSendTickersMutation } from '../../redux/financeAPI';
+import { changeColorOnValue, dateToLocalTime } from '../../utils/data-formatin';
+import s from './FinanceTable.module.css';
 
 export default function FinanceTable({ data }) {
-  
-
-
   const anchorCategory = document.querySelector('#filtrTicker');
 
-  const [sendTickers]=useSendTickersMutation()
+  const [sendTickers] = useSendTickersMutation();
   const [amountSort, setAmountSort] = useState({});
   const [localFilter, setLocalFilter] = useState([]);
   const [tickersFilter, setTickersFilter] = useState([]);
   const [transactions, setTransactions] = useState(data);
   const [isMenuTickerOpen, setIsMenuTickerOpen] = useState(false);
 
-
   useEffect(() => {
-    
-    const initialFilterState = JSON.parse(localStorage.getItem('tickers'))
-    if (initialFilterState) setTickersFilter(initialFilterState)
+    const initialFilterState = JSON.parse(localStorage.getItem('tickers'));
+    if (initialFilterState) setTickersFilter(initialFilterState);
 
- setTransactions(data)
-
+    setTransactions(data);
   }, [data, localFilter]);
 
-  const sortByAmount = (property:string) => {
+  const sortByAmount = (property: string) => {
     let filterdTransactions = [];
     if (!amountSort.hasOwnProperty(property)) {
-      setAmountSort({[property]:false})
+      setAmountSort({ [property]: false });
     }
     if (amountSort[property]) {
-      filterdTransactions = [...data].sort(
-        (a, b) => a[property] - b[property]
-      );
-      setAmountSort({[property]:false});
+      filterdTransactions = [...data].sort((a, b) => a[property] - b[property]);
+      setAmountSort({ [property]: false });
     } else {
-      filterdTransactions = [...data].sort(
-        (a, b) => b[property]- a[property]
-      );
-      setAmountSort({[property]:true});
+      filterdTransactions = [...data].sort((a, b) => b[property] - a[property]);
+      setAmountSort({ [property]: true });
     }
 
     setTransactions(filterdTransactions);
   };
 
-
-  const handleSetTickersFilter = (event: React.ChangeEvent<HTMLInputElement>) => {
-    
-   const newFiltervalue=tickersFilter.map((obj) =>
-   {
-     if (obj.hasOwnProperty(event.target.name)) {
-         obj[event.target.name] = event.target.checked
-          return obj
-        }
-        return obj
+  const handleSetTickersFilter = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newFiltervalue = tickersFilter.map(obj => {
+      if (obj.hasOwnProperty(event.target.name)) {
+        obj[event.target.name] = event.target.checked;
+        return obj;
       }
-    )
-     localStorage.setItem('tickers', JSON.stringify(newFiltervalue))
-      setLocalFilter(newFiltervalue)
+      return obj;
+    });
+    localStorage.setItem('tickers', JSON.stringify(newFiltervalue));
+    setLocalFilter(newFiltervalue);
   };
 
   const filterByTickers = async () => {
-   
-    if (tickersFilter.filter((obj) => Object.values(obj)[0]).length === 0) {
-      return
+    if (tickersFilter.filter(obj => Object.values(obj)[0]).length === 0) {
+      return;
     }
     const { data } = await sendTickers(tickersFilter);
     setTransactions(data);
     setIsMenuTickerOpen(false);
-   
-  }
+  };
   const handleResetTickers = async () => {
-  localStorage.setItem('tickers', JSON.stringify([
-  { AAPL: false },
-  { GOOGL: false },
-  { MSFT: false },
-  { AMZN: false },
-  { FB: false },
-  { TSLA: false },
-  ]))
-  setLocalFilter([
-  { AAPL: false },
-  { GOOGL: false },
-  { MSFT: false },
-  { AMZN: false },
-  { FB: false },
-  { TSLA: false },
-  ])  
-   await sendTickers([
-  { AAPL: true},
-  { GOOGL: true },
-  { MSFT: true },
-  { AMZN: true },
-  { FB: true},
-  { TSLA: true },
+    localStorage.setItem(
+      'tickers',
+      JSON.stringify([
+        { AAPL: false },
+        { GOOGL: false },
+        { MSFT: false },
+        { AMZN: false },
+        { FB: false },
+        { TSLA: false },
+      ])
+    );
+    setLocalFilter([
+      { AAPL: false },
+      { GOOGL: false },
+      { MSFT: false },
+      { AMZN: false },
+      { FB: false },
+      { TSLA: false },
     ]);
-   
-  }
+    await sendTickers([
+      { AAPL: true },
+      { GOOGL: true },
+      { MSFT: true },
+      { AMZN: true },
+      { FB: true },
+      { TSLA: true },
+    ]);
+  };
 
   return (
     <div className={s.container}>
       <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650}} padding='normal' size="small" aria-label="simple table" className={s.table}>
-        <TableHead >
-          <TableRow className={s.headerRow}>
-            <TableCell sx={{cursor:'pointer'}} className={s.headerCell} id="filtrTicker" onClick={() => {
-                setIsMenuTickerOpen(true);
-              }}>Ticker</TableCell>
-            <TableCell align='center'  className={s.headerCell}>Exchange</TableCell>
-            <TableCell align='center'sx={{cursor:'pointer'}} className={s.headerCell} onClick={()=>sortByAmount('price')}>Price</TableCell>
-            <TableCell align='center' sx={{cursor:'pointer'}} className={s.headerCell} onClick={() => sortByAmount('change')}>Change</TableCell>
-            <TableCell align='center' sx={{cursor:'pointer'}} className={s.headerCell} onClick={() => sortByAmount('change_percent')}>Change persent</TableCell>
-            <TableCell align='center' sx={{cursor:'pointer'}} className={s.headerCell} onClick={() => sortByAmount('dividend')}>Devident</TableCell>
-            <TableCell align='center' sx={{cursor:'pointer'}} className={s.headerCell} onClick={() => sortByAmount('yield')}>Yield</TableCell>
-            <TableCell align='center' className={s.headerCell} ><p>Last trade time on</p><p>{data[0]?.last_trade_time.slice(0,10)}</p></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {transactions?.map((row) => (
-            <TableRow
-              key={row.ticker}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-              role="checkbox"
-              className={s.tableRow}
-            >
-              <TableCell component="th" scope="row">
-                {row.ticker}
+        <Table
+          sx={{ minWidth: 650 }}
+          padding="normal"
+          size="small"
+          aria-label="simple table"
+          className={s.table}
+        >
+          <TableHead>
+            <TableRow className={s.headerRow}>
+              <TableCell
+                sx={{ cursor: 'pointer' }}
+                className={s.headerCell}
+                id="filtrTicker"
+                onClick={() => {
+                  setIsMenuTickerOpen(true);
+                }}
+              >
+                Ticker
               </TableCell>
-              <TableCell align='center' >{row.exchange}</TableCell>
-              <TableCell align='center' >{row.price}</TableCell>
-              <TableCell align='center' sx={changeColororOnValue(row.change)}>{row.change}</TableCell>
-              <TableCell align='center' sx={changeColororOnValue(row.change_percent)}>{row.change_percent} %</TableCell>
-              <TableCell align='center'>{row.dividend}</TableCell>
-              <TableCell align='center'>{row.yield}</TableCell>
-              <TableCell align='center'>{dateToLocalTime(row.last_trade_time)}</TableCell>
+              <TableCell align="center" className={s.headerCell}>
+                Exchange
+              </TableCell>
+              <TableCell
+                align="center"
+                sx={{ cursor: 'pointer' }}
+                className={s.headerCell}
+                onClick={() => sortByAmount('price')}
+              >
+                Price
+              </TableCell>
+              <TableCell
+                align="center"
+                sx={{ cursor: 'pointer' }}
+                className={s.headerCell}
+                onClick={() => sortByAmount('change')}
+              >
+                Change
+              </TableCell>
+              <TableCell
+                align="center"
+                sx={{ cursor: 'pointer' }}
+                className={s.headerCell}
+                onClick={() => sortByAmount('change_percent')}
+              >
+                Change persent
+              </TableCell>
+              <TableCell
+                align="center"
+                sx={{ cursor: 'pointer' }}
+                className={s.headerCell}
+                onClick={() => sortByAmount('dividend')}
+              >
+                Devident
+              </TableCell>
+              <TableCell
+                align="center"
+                sx={{ cursor: 'pointer' }}
+                className={s.headerCell}
+                onClick={() => sortByAmount('yield')}
+              >
+                Yield
+              </TableCell>
+              <TableCell align="center" className={s.headerCell}>
+                <p>Last trade time on</p>
+                <p>{data[0]?.last_trade_time.slice(0, 10)}</p>
+              </TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-    <Menu
+          </TableHead>
+          <TableBody>
+            {transactions?.map(row => (
+              <TableRow
+                key={row.ticker}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                role="checkbox"
+                className={s.tableRow}
+              >
+                <TableCell component="th" scope="row">
+                  {row.ticker}
+                </TableCell>
+                <TableCell align="center">{row.exchange}</TableCell>
+                <TableCell align="center">{row.price}</TableCell>
+                <TableCell align="center" sx={changeColorOnValue(row.change)}>
+                  {row.change}
+                </TableCell>
+                <TableCell
+                  align="center"
+                  sx={changeColorOnValue(row.change_percent)}
+                >
+                  {row.change_percent} %
+                </TableCell>
+                <TableCell align="center">{row.dividend}</TableCell>
+                <TableCell align="center">{row.yield}</TableCell>
+                <TableCell align="center">
+                  {dateToLocalTime(row.last_trade_time)}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <Menu
         id="basic-menu"
         anchorEl={anchorCategory}
         autoFocus={false}
         open={isMenuTickerOpen}
-        onClose={() => 
-          setIsMenuTickerOpen(false)
-        }
+        onClose={() => setIsMenuTickerOpen(false)}
         MenuListProps={{
           'aria-labelledby': 'basic-button',
         }}
@@ -170,19 +216,20 @@ export default function FinanceTable({ data }) {
             key={Object.keys(el)[0]}
             id={Object.keys(el)[0]}
             sx={{ fontSize: '12px' }}
-          ><Checkbox
-      checked={Object.values(el)[0]}
-      onChange={handleSetTickersFilter}
+          >
+            <Checkbox
+              checked={Object.values(el)[0]}
+              onChange={handleSetTickersFilter}
               name={Object.keys(el)[0]}
-              className='checkdox'
-    />
+              className="checkdox"
+            />
             {Object.keys(el)[0]}
           </MenuItem>
         ))}
         <MenuItem
           onClick={filterByTickers}
           key="filter"
-          sx={{ fontSize: '14px', justifyContent: 'center'  }}
+          sx={{ fontSize: '14px', justifyContent: 'center' }}
         >
           Filter
         </MenuItem>
@@ -194,6 +241,6 @@ export default function FinanceTable({ data }) {
           Reset
         </MenuItem>
       </Menu>
-   </div>
+    </div>
   );
 }
