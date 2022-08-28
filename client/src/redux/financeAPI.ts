@@ -1,6 +1,10 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { io } from 'socket.io-client';
-import { tikersType, tikersFilterType } from '../utils/ts-types';
+import {
+  tikersType,
+  tikersFilterType,
+  sendTickersType,
+} from '../utils/ts-types';
 export const financeAPI = createApi({
   reducerPath: 'finaceAPI',
   baseQuery: fetchBaseQuery({
@@ -33,7 +37,7 @@ export const financeAPI = createApi({
     sendTickers: builder.mutation({
       queryFn: (tickersFilter: tikersFilterType) => {
         const socket = io('http://localhost:4000');
-        return new Promise(resolve => {
+        return new Promise<sendTickersType>(resolve => {
           socket.emit(
             'changeTickers',
             tickersFilter,

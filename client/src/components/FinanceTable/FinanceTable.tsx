@@ -11,32 +11,50 @@ import MenuItem from '@mui/material/MenuItem';
 import Checkbox from '@mui/material/Checkbox';
 import { useSendTickersMutation } from '../../redux/financeAPI';
 import { changeColorOnValue, dateToLocalTime } from '../../utils/data-formatin';
+import {
+  tikersType,
+  tikersFilterType,
+  amountSortType,
+  sendTickersType,
+} from '../../utils/ts-types';
 import s from './FinanceTable.module.css';
 
-export default function FinanceTable({ data }) {
+export default function FinanceTable(prop: { data: tikersType[] }) {
+  const { data } = prop;
   const anchorCategory = document.querySelector('#filtrTicker');
 
   const [sendTickers] = useSendTickersMutation();
-  const [amountSort, setAmountSort] = useState({});
-  const [localFilter, setLocalFilter] = useState([]);
-  const [tickersFilter, setTickersFilter] = useState([]);
+  const [amountSort, setAmountSort] = useState<amountSortType>({});
+  const [localFilter, setLocalFilter] = useState<tikersFilterType | []>([]);
+  const [tickersFilter, setTickersFilter] = useState<tikersFilterType | []>([]);
   const [transactions, setTransactions] = useState(data);
   const [isMenuTickerOpen, setIsMenuTickerOpen] = useState(false);
 
   useEffect(() => {
-    const initialFilterState = JSON.parse(localStorage.getItem('tickers'));
-    if (initialFilterState) setTickersFilter(initialFilterState);
+    const result = localStorage.getItem('tickers');
+    if (result) {
+      const initialFilterState = JSON.parse(result);
+      setTickersFilter(initialFilterState);
+    }
 
     setTransactions(data);
   }, [data, localFilter]);
 
-  const sortByAmount = (property: string) => {
+  const sortByAmount = (property: keyof amountSortType) => {
     let filterdTransactions = [];
     if (!amountSort.hasOwnProperty(property)) {
       setAmountSort({ [property]: false });
     }
     if (amountSort[property]) {
-      filterdTransactions = [...data].sort((a, b) => a[property] - b[property]);
+      filterdTransactions = [...data].sort((a, b) => {
+        if (
+          typeof a[property] === 'number' &&
+          typeof b[property] === 'number'
+        ) {
+          return a[property] - b[property];
+        }
+        return 1;
+      });
       setAmountSort({ [property]: false });
     } else {
       filterdTransactions = [...data].sort((a, b) => b[property] - a[property]);
@@ -64,9 +82,16 @@ export default function FinanceTable({ data }) {
     if (tickersFilter.filter(obj => Object.values(obj)[0]).length === 0) {
       return;
     }
-    const { data } = await sendTickers(tickersFilter);
-    setTransactions(data);
-    setIsMenuTickerOpen(false);
+    try {
+      const data = await sendTickers(tickersFilter);
+      console.log(data);
+      if (data.hasOwnProperty('res')) {
+        setTransactions(data.data);
+        setIsMenuTickerOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
   const handleResetTickers = async () => {
     localStorage.setItem(
