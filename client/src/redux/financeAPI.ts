@@ -10,7 +10,6 @@ export const financeAPI = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: 'http://localhost:4000',
   }),
-  tagTypes: ['Tickers'],
   endpoints: builder => ({
     getData: builder.query({
       queryFn: () => ({ data: [] }),

@@ -16,6 +16,7 @@ import {
   tikersFilterType,
   amountSortType,
 } from '../../utils/ts-types';
+
 import s from './FinanceTable.module.css';
 
 export default function FinanceTable(prop: { data: tikersType[] }) {
@@ -24,8 +25,8 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
 
   const [sendTickers] = useSendTickersMutation();
   const [amountSort, setAmountSort] = useState<amountSortType>({});
-  const [localFilter, setLocalFilter] = useState<tikersFilterType | []>([]);
-  const [tickersFilter, setTickersFilter] = useState<tikersFilterType | []>([]);
+  const [localFilter, setLocalFilter] = useState<tikersFilterType>([]);
+  const [tickersFilter, setTickersFilter] = useState<tikersFilterType>([]);
   const [transactions, setTransactions] = useState<tikersType[]>(data);
   const [isMenuTickerOpen, setIsMenuTickerOpen] = useState(false);
   console.log(data);

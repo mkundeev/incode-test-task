@@ -13,7 +13,7 @@ describe('changeColorOnValue', () => {
 });
 
 describe('dateToLocalTime', () => {
-  test('should retern tiem', () => {
+  test('should retern time in correct format', () => {
     expect(dateToLocalTime('2022-08-28T08:00:22.000Z')).toBe('11:00:22');
   });
 });

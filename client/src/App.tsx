@@ -4,7 +4,7 @@ import FinanceTable from './components/FinanceTable/FinanceTable';
 import { useGetDataType } from './utils/ts-types';
 
 function App() {
-  const { data, isLoading } = useGetDataQuery<useGetDataType>('');
+  const { data, isLoading } = useGetDataQuery('') as useGetDataType;
 
   return (
     <Container sx={{ p: 5 }}>
