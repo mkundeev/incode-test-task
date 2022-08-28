@@ -15,7 +15,6 @@ import {
   tikersType,
   tikersFilterType,
   amountSortType,
-  sendTickersType,
 } from '../../utils/ts-types';
 import s from './FinanceTable.module.css';
 
@@ -27,8 +26,9 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
   const [amountSort, setAmountSort] = useState<amountSortType>({});
   const [localFilter, setLocalFilter] = useState<tikersFilterType | []>([]);
   const [tickersFilter, setTickersFilter] = useState<tikersFilterType | []>([]);
-  const [transactions, setTransactions] = useState(data);
+  const [transactions, setTransactions] = useState<tikersType[]>(data);
   const [isMenuTickerOpen, setIsMenuTickerOpen] = useState(false);
+  console.log(data);
 
   useEffect(() => {
     const result = localStorage.getItem('tickers');
@@ -46,15 +46,7 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
       setAmountSort({ [property]: false });
     }
     if (amountSort[property]) {
-      filterdTransactions = [...data].sort((a, b) => {
-        if (
-          typeof a[property] === 'number' &&
-          typeof b[property] === 'number'
-        ) {
-          return a[property] - b[property];
-        }
-        return 1;
-      });
+      filterdTransactions = [...data].sort((a, b) => a[property] - b[property]);
       setAmountSort({ [property]: false });
     } else {
       filterdTransactions = [...data].sort((a, b) => b[property] - a[property]);
@@ -82,13 +74,13 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
     if (tickersFilter.filter(obj => Object.values(obj)[0]).length === 0) {
       return;
     }
+
+    sendTickers(tickersFilter).then(data => console.log(data));
+
     try {
-      const data = await sendTickers(tickersFilter);
-      console.log(data);
-      if (data.hasOwnProperty('res')) {
-        setTransactions(data.data);
-        setIsMenuTickerOpen(false);
-      }
+      const { data } = (await sendTickers(tickersFilter)) as any;
+      setTransactions(data);
+      setIsMenuTickerOpen(false);
     } catch (err) {
       console.log(err);
     }
@@ -124,7 +116,7 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
   };
 
   return (
-    <div className={s.container}>
+    <>
       <TableContainer component={Paper}>
         <Table
           sx={{ minWidth: 650 }}
@@ -266,6 +258,6 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
           Reset
         </MenuItem>
       </Menu>
-    </div>
+    </>
   );
 }

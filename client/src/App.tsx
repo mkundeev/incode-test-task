@@ -1,18 +1,16 @@
-import './App.css';
 import Container from '@mui/material/Container';
 import { useGetDataQuery } from './redux/financeAPI';
 import FinanceTable from './components/FinanceTable/FinanceTable';
-import { tikersType } from './utils/ts-types';
-
-type useGetDataType = {
-  data: tikersType[];
-  isLoading: boolean;
-};
+import { useGetDataType } from './utils/ts-types';
 
 function App() {
   const { data, isLoading } = useGetDataQuery<useGetDataType>('');
 
-  return <Container>{!isLoading && <FinanceTable data={data} />}</Container>;
+  return (
+    <Container sx={{ p: 5 }}>
+      {!isLoading && <FinanceTable data={data} data-testid="finance-table" />}
+    </Container>
+  );
 }
 
 export default App;

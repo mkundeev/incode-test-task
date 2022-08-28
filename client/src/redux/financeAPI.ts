@@ -38,13 +38,9 @@ export const financeAPI = createApi({
       queryFn: (tickersFilter: tikersFilterType) => {
         const socket = io('http://localhost:4000');
         return new Promise<sendTickersType>(resolve => {
-          socket.emit(
-            'changeTickers',
-            tickersFilter,
-            (response: tikersType[]) => {
-              resolve({ data: response });
-            }
-          );
+          socket.emit('changeTickers', tickersFilter, (data: tikersType[]) => {
+            resolve({ data });
+          });
         });
       },
     }),

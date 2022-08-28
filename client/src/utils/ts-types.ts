@@ -1,6 +1,6 @@
 export type tikersType = {
   ticker: string;
-  exchange: 'NASDAQ';
+  exchange: string;
   price: number;
   change: number;
   change_percent: number;
@@ -20,4 +20,9 @@ export type amountSortType = {
 
 export type sendTickersType = {
   data: tikersType[];
+};
+
+export type useGetDataType = {
+  data: tikersType[];
+  isLoading: boolean;
 };
