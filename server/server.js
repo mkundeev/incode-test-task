@@ -4,6 +4,10 @@ const http = require('http');
 const io = require('socket.io');
 const cors = require('cors');
 const logger = require('morgan');
+require('dotenv').config();
+const { dbConnection } = require('./src/db/conection');
+const { Data } = require('./src/db/dataSchema');
+const dataRouter = require('./src/routes/data');
 
 const FETCH_INTERVAL = 10000;
 const PORT = process.env.PORT || 4000;
@@ -52,7 +56,7 @@ async function getQuotes(socket) {
         last_trade_time: utcDate(),
       };
     });
-
+  await Data.create(quotes);
   socket.emit('ticker', quotes);
 }
 
@@ -77,6 +81,8 @@ app.use(logger('combined'));
 const server = http.createServer(app);
 app.use(express.json());
 
+app.use('/data', dataRouter);
+
 const socketServer = io(server, {
   cors: {
     origin: '*',
@@ -91,7 +97,7 @@ socketServer.on('connection', socket => {
   socket.on('start', () => {
     trackTickers(socket);
   });
-  socket.on('changeTickers', (arg, callback) => {
+  socket.on('changeTickers', async (arg, callback) => {
     tickers = arg;
     const quotes = tickers
       .filter(obj => Object.values(obj)[0])
@@ -110,10 +116,18 @@ socketServer.on('connection', socket => {
           last_trade_time: utcDate(),
         };
       });
+    await Data.create(quotes);
     callback(quotes);
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`Streaming service is running on http://localhost:${PORT}`);
+server.listen(PORT, async () => {
+  try {
+    await dbConnection();
+    console.log('Database connection successful');
+    console.log(`Streaming service is running on http://localhost:${PORT}`);
+  } catch (err) {
+    console.log(err.message);
+    process.exit(1);
+  }
 });

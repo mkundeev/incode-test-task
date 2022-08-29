@@ -1,3 +1,6 @@
+import { SerializedError } from '@reduxjs/toolkit';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+
 export type tikersType = {
   ticker: string;
   exchange: string;
@@ -25,4 +28,9 @@ export type sendTickersType = {
 export type useGetDataType = {
   data: tikersType[];
   isLoading: boolean;
+};
+
+export type dataType = {
+  data?: tikersType[];
+  error?: FetchBaseQueryError | SerializedError;
 };

@@ -1,5 +1,7 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import FinanceTable from './FinanceTable';
+import { Provider } from 'react-redux';
+import { store } from '../../redux/store';
 
 const testData = [
   {
@@ -65,11 +67,36 @@ const testData = [
 ];
 
 describe('FinanceTable', () => {
-  test('renders learn react link', () => {
-    // render(<FinanceTable data={testData} />);
+  test('should render FinanceTable', () => {
+    render(
+      <Provider store={store}>
+        <FinanceTable data={testData} />
+      </Provider>
+    );
+    const tableElement = screen.getByTestId('table');
+    const tableBodyElement = screen.getByTestId('tableBody');
+    expect(tableElement).toBeInTheDocument();
+    expect(tableBodyElement.childElementCount).toBe(testData.length);
+  });
+});
 
-    const test = 1;
-
-    expect(test).toBe(1);
+describe('Menu', () => {
+  test('should open on ticker cell click and close on filter click', async () => {
+    render(
+      <Provider store={store}>
+        <FinanceTable data={testData} />
+      </Provider>
+    );
+    const tickerCellElement = screen.getByTestId('tickerCell');
+    let tickerMenu = screen.queryByTestId('tickersMenu');
+    expect(tickerMenu).toBeNull();
+    fireEvent.click(tickerCellElement);
+    expect(screen.getByTestId('tickersMenu')).toBeInTheDocument();
+    const filterBtnElement = screen.getByTestId('filterBtn');
+    fireEvent.click(filterBtnElement);
+    setTimeout(() => {
+      tickerMenu = screen.queryByTestId('tickersMenu');
+    }, 100);
+    expect(tickerMenu).toBeNull();
   });
 });

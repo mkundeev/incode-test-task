@@ -11,13 +11,24 @@ import MenuItem from '@mui/material/MenuItem';
 import Checkbox from '@mui/material/Checkbox';
 import { useSendTickersMutation } from '../../redux/financeAPI';
 import { changeColorOnValue, dateToLocalTime } from '../../utils/data-formatin';
+import { tickersFilterAllTrue } from './filterSetings';
 import {
   tikersType,
   tikersFilterType,
   amountSortType,
+  dataType,
 } from '../../utils/ts-types';
 
 import s from './FinanceTable.module.css';
+
+// const tickersFilterAllFalse: tikersFilterType = [
+//   { AAPL: false },
+//   { GOOGL: false },
+//   { MSFT: false },
+//   { AMZN: false },
+//   { FB: false },
+//   { TSLA: false },
+// ];
 
 export default function FinanceTable(prop: { data: tikersType[] }) {
   const { data } = prop;
@@ -25,21 +36,18 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
 
   const [sendTickers] = useSendTickersMutation();
   const [amountSort, setAmountSort] = useState<amountSortType>({});
-  const [localFilter, setLocalFilter] = useState<tikersFilterType>([]);
   const [tickersFilter, setTickersFilter] = useState<tikersFilterType>([]);
   const [transactions, setTransactions] = useState<tikersType[]>(data);
   const [isMenuTickerOpen, setIsMenuTickerOpen] = useState(false);
-  console.log(data);
 
   useEffect(() => {
     const result = localStorage.getItem('tickers');
     if (result) {
-      const initialFilterState = JSON.parse(result);
+      const initialFilterState: tikersFilterType = JSON.parse(result);
       setTickersFilter(initialFilterState);
     }
-
     setTransactions(data);
-  }, [data, localFilter]);
+  }, [data]);
 
   const sortByAmount = (property: keyof amountSortType) => {
     let filterdTransactions = [];
@@ -68,20 +76,25 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
       return obj;
     });
     localStorage.setItem('tickers', JSON.stringify(newFiltervalue));
-    setLocalFilter(newFiltervalue);
+    setTickersFilter(newFiltervalue);
   };
 
   const filterByTickers = async () => {
+    setIsMenuTickerOpen(false);
+    let filterTickers: tikersFilterType;
     if (tickersFilter.filter(obj => Object.values(obj)[0]).length === 0) {
-      return;
+      filterTickers = tickersFilterAllTrue;
+    } else {
+      filterTickers = tickersFilter;
+      setTickersFilter(filterTickers);
     }
 
-    sendTickers(tickersFilter).then(data => console.log(data));
-
     try {
-      const { data } = (await sendTickers(tickersFilter)) as any;
+      const { data }: dataType = await sendTickers(filterTickers);
+      if (!data) {
+        return;
+      }
       setTransactions(data);
-      setIsMenuTickerOpen(false);
     } catch (err) {
       console.log(err);
     }
@@ -98,21 +111,14 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
         { TSLA: false },
       ])
     );
-    setLocalFilter([
+
+    setTickersFilter([
       { AAPL: false },
       { GOOGL: false },
       { MSFT: false },
       { AMZN: false },
       { FB: false },
       { TSLA: false },
-    ]);
-    await sendTickers([
-      { AAPL: true },
-      { GOOGL: true },
-      { MSFT: true },
-      { AMZN: true },
-      { FB: true },
-      { TSLA: true },
     ]);
   };
 
@@ -125,6 +131,7 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
           size="small"
           aria-label="simple table"
           className={s.table}
+          data-testid="table"
         >
           <TableHead>
             <TableRow className={s.headerRow}>
@@ -135,6 +142,7 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
                 onClick={() => {
                   setIsMenuTickerOpen(true);
                 }}
+                data-testid="tickerCell"
               >
                 Ticker
               </TableCell>
@@ -182,12 +190,11 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
                 Yield
               </TableCell>
               <TableCell align="center" className={s.headerCell}>
-                <p>Last trade time on</p>
-                <p>{data[0]?.last_trade_time.slice(0, 10)}</p>
+                Last trade time
               </TableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
+          <TableBody data-testid="tableBody">
             {transactions?.map(row => (
               <TableRow
                 key={row.ticker}
@@ -224,10 +231,13 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
         anchorEl={anchorCategory}
         autoFocus={false}
         open={isMenuTickerOpen}
-        onClose={() => setIsMenuTickerOpen(false)}
+        onClose={() => {
+          setIsMenuTickerOpen(false);
+        }}
         MenuListProps={{
           'aria-labelledby': 'basic-button',
         }}
+        data-testid="tickersMenu"
       >
         {tickersFilter.map(el => (
           <MenuItem
@@ -239,7 +249,7 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
               checked={Object.values(el)[0]}
               onChange={handleSetTickersFilter}
               name={Object.keys(el)[0]}
-              className="checkdox"
+              data-testid="checkBox"
             />
             {Object.keys(el)[0]}
           </MenuItem>
@@ -248,6 +258,7 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
           onClick={filterByTickers}
           key="filter"
           sx={{ fontSize: '14px', justifyContent: 'center' }}
+          data-testid="filterBtn"
         >
           Filter
         </MenuItem>
