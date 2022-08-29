@@ -11,6 +11,11 @@ export const financeAPI = createApi({
     baseUrl: 'http://localhost:4000',
   }),
   endpoints: builder => ({
+    getDataForTicker: builder.query({
+      query: ticker => ({
+        url: `data/${ticker}`,
+      }),
+    }),
     getData: builder.query({
       queryFn: () => ({ data: [] }),
       async onCacheEntryAdded(
@@ -46,4 +51,8 @@ export const financeAPI = createApi({
   }),
 });
 
-export const { useGetDataQuery, useSendTickersMutation } = financeAPI;
+export const {
+  useGetDataQuery,
+  useSendTickersMutation,
+  useLazyGetDataForTickerQuery,
+} = financeAPI;

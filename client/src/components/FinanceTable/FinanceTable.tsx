@@ -11,7 +11,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Checkbox from '@mui/material/Checkbox';
 import { useSendTickersMutation } from '../../redux/financeAPI';
 import { changeColorOnValue, dateToLocalTime } from '../../utils/data-formatin';
-import { tickersFilterAllTrue } from './filterSetings';
+
 import {
   tikersType,
   tikersFilterType,
@@ -20,15 +20,6 @@ import {
 } from '../../utils/ts-types';
 
 import s from './FinanceTable.module.css';
-
-// const tickersFilterAllFalse: tikersFilterType = [
-//   { AAPL: false },
-//   { GOOGL: false },
-//   { MSFT: false },
-//   { AMZN: false },
-//   { FB: false },
-//   { TSLA: false },
-// ];
 
 export default function FinanceTable(prop: { data: tikersType[] }) {
   const { data } = prop;
@@ -83,7 +74,14 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
     setIsMenuTickerOpen(false);
     let filterTickers: tikersFilterType;
     if (tickersFilter.filter(obj => Object.values(obj)[0]).length === 0) {
-      filterTickers = tickersFilterAllTrue;
+      filterTickers = [
+        { AAPL: true },
+        { GOOGL: true },
+        { MSFT: true },
+        { AMZN: true },
+        { FB: true },
+        { TSLA: true },
+      ];
     } else {
       filterTickers = tickersFilter;
       setTickersFilter(filterTickers);
