@@ -3,9 +3,6 @@ const { getDataController } = require('../controllers/dataController');
 
 const { errorHandler } = require('../middlewares/errorHandler');
 
-// const { queryDataSchema } = require('../../models/usersSchema');
-// const { validation } = require('../middlewares/validation');
-
 const router = express.Router();
 
 router.get('/:ticker', errorHandler(getDataController));

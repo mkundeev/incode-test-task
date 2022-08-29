@@ -57,7 +57,7 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
     setTransactions(filterdTransactions);
   };
 
-  const handleSetTickersFilter = (
+  const handleCheckboxChangeTickers = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const newFiltervalue = tickersFilter.map(obj => {
@@ -71,7 +71,7 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
     setTickersFilter(newFiltervalue);
   };
 
-  const filterByTickers = async () => {
+  const filterByCheckedTickers = async () => {
     setIsMenuTickerOpen(false);
     let filterTickers: tikersFilterType;
     if (tickersFilter.filter(obj => Object.values(obj)[0]).length === 0) {
@@ -130,7 +130,7 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
           size="small"
           aria-label="simple table"
           className={s.table}
-          data-testid="table"
+          data-testid="tableMain"
         >
           <TableHead>
             <TableRow className={s.headerRow}>
@@ -219,7 +219,11 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
                 <TableCell align="center">{row.yield}</TableCell>
                 <TableCell align="center">
                   {dateToLocalTime(row.last_trade_time)}
-                  <Link to={`/history/${row.ticker}`} className={s.link}>
+                  <Link
+                    to={`/history/${row.ticker}`}
+                    className={s.link}
+                    data-testid="linkToHistory"
+                  >
                     Look history
                   </Link>
                 </TableCell>
@@ -233,9 +237,7 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
         anchorEl={anchorCategory}
         autoFocus={false}
         open={isMenuTickerOpen}
-        onClose={() => {
-          setIsMenuTickerOpen(false);
-        }}
+        onClose={() => setIsMenuTickerOpen(false)}
         MenuListProps={{
           'aria-labelledby': 'basic-button',
         }}
@@ -249,15 +251,14 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
           >
             <Checkbox
               checked={Object.values(el)[0]}
-              onChange={handleSetTickersFilter}
+              onChange={handleCheckboxChangeTickers}
               name={Object.keys(el)[0]}
-              data-testid="checkBox"
             />
             {Object.keys(el)[0]}
           </MenuItem>
         ))}
         <MenuItem
-          onClick={filterByTickers}
+          onClick={filterByCheckedTickers}
           key="filter"
           sx={{ fontSize: '14px', justifyContent: 'center' }}
           data-testid="filterBtn"
@@ -272,6 +273,7 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
           Reset
         </MenuItem>
       </Menu>
+      {data?.length === 0 && <p className={s.notFoundMassege}>No data found</p>}
     </>
   );
 }

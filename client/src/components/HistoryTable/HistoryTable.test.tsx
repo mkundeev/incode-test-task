@@ -1,11 +1,12 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import FinanceTable from './FinanceTable';
+import { render, screen } from '@testing-library/react';
+import HistoryTable from './HistoryTable';
 import { Provider } from 'react-redux';
 import { store } from '../../redux/store';
 import { MemoryRouter } from 'react-router-dom';
 
 const testData = [
   {
+    _id: '1',
     ticker: 'AAPL',
     exchange: 'NASDAQ',
     price: 118.15,
@@ -16,7 +17,8 @@ const testData = [
     last_trade_time: '2022-08-28T15:17:59.000Z',
   },
   {
-    ticker: 'GOOGL',
+    _id: '2',
+    ticker: 'AAPL',
     exchange: 'NASDAQ',
     price: 164.27,
     change: 7.73,
@@ -26,7 +28,8 @@ const testData = [
     last_trade_time: '2022-08-28T15:17:59.000Z',
   },
   {
-    ticker: 'MSFT',
+    _id: '3',
+    ticker: 'AAPL',
     exchange: 'NASDAQ',
     price: 247.54,
     change: 14.26,
@@ -36,7 +39,8 @@ const testData = [
     last_trade_time: '2022-08-28T15:17:59.000Z',
   },
   {
-    ticker: 'AMZN',
+    _id: '4',
+    ticker: 'AAPL',
     exchange: 'NASDAQ',
     price: 112.14,
     change: -9.52,
@@ -46,7 +50,8 @@ const testData = [
     last_trade_time: '2022-08-28T15:17:59.000Z',
   },
   {
-    ticker: 'FB',
+    _id: '5',
+    ticker: 'AAPL',
     exchange: 'NASDAQ',
     price: 210.1,
     change: -6.69,
@@ -55,53 +60,20 @@ const testData = [
     yield: 1.57,
     last_trade_time: '2022-08-28T15:17:59.000Z',
   },
-  {
-    ticker: 'TSLA',
-    exchange: 'NASDAQ',
-    price: 149.38,
-    change: 17.98,
-    change_percent: 12.04,
-    dividend: 0.83,
-    yield: 1.62,
-    last_trade_time: '2022-08-28T15:17:59.000Z',
-  },
 ];
 
-describe('FinanceTable', () => {
-  test('should render FinanceTable', () => {
+describe('HistoryTable', () => {
+  test('should render HistoryTable', () => {
     render(
       <Provider store={store}>
         <MemoryRouter>
-          <FinanceTable data={testData} />
+          <HistoryTable data={testData} />
         </MemoryRouter>
       </Provider>
     );
-    const tableElement = screen.getByTestId('tableMain');
+    const tableElement = screen.getByTestId('tableHistory');
     const tableBodyElement = screen.getByTestId('tableBody');
     expect(tableElement).toBeInTheDocument();
     expect(tableBodyElement.childElementCount).toBe(testData.length);
-  });
-});
-
-describe('Menu', () => {
-  test('should open on ticker cell click and close on filter click', async () => {
-    render(
-      <Provider store={store}>
-        <MemoryRouter>
-          <FinanceTable data={testData} />
-        </MemoryRouter>
-      </Provider>
-    );
-    const tickerCellElement = screen.getByTestId('tickerCell');
-    let tickerMenu = screen.queryByTestId('tickersMenu');
-    expect(tickerMenu).toBeNull();
-    fireEvent.click(tickerCellElement);
-    expect(screen.getByTestId('tickersMenu')).toBeInTheDocument();
-    const filterBtnElement = screen.getByTestId('filterBtn');
-    fireEvent.click(filterBtnElement);
-    setTimeout(() => {
-      tickerMenu = screen.queryByTestId('tickersMenu');
-    }, 100);
-    expect(tickerMenu).toBeNull();
   });
 });

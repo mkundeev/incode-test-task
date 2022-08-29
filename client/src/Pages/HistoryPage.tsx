@@ -10,7 +10,6 @@ export default function HistoryPage() {
   const { ticker } = useParams();
   const { data, isLoading } =
     useGetDataForTickerQuery<useGetDataHistoryType>(ticker);
-
   return (
     <Container sx={{ p: 5 }} data-testid="container">
       {isLoading && (
