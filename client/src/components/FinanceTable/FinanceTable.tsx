@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -218,6 +219,9 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
                 <TableCell align="center">{row.yield}</TableCell>
                 <TableCell align="center">
                   {dateToLocalTime(row.last_trade_time)}
+                  <Link to={`/history/${row.ticker}`} className={s.link}>
+                    Look history
+                  </Link>
                 </TableCell>
               </TableRow>
             ))}

@@ -54,5 +54,5 @@ export const financeAPI = createApi({
 export const {
   useGetDataQuery,
   useSendTickersMutation,
-  useLazyGetDataForTickerQuery,
+  useGetDataForTickerQuery,
 } = financeAPI;
