@@ -34,3 +34,21 @@ export type dataType = {
   data?: tikersType[];
   error?: FetchBaseQueryError | SerializedError;
 };
+
+// ===========History page==============//
+
+export type tickersHistoryType = {
+  _id: string;
+  ticker: string;
+  exchange: string;
+  price: number;
+  change: number;
+  change_percent: number;
+  dividend: number;
+  yield: number;
+  last_trade_time: string;
+};
+export type useGetDataHistoryType = {
+  data: { data: tickersHistoryType[] };
+  isLoading: boolean;
+};

@@ -31,24 +31,12 @@
     background-color: rgb(222, 231, 231);
 }
 
-.link{
-    display: block;
-    font-size: 14px;
-    background-color: aqua;
-   border-radius: 5px;
-   text-decoration: none;
-   color: black;
-   width: fit-content;
-   padding-left: 5px;
-   padding-right: 5px;
-   margin: 0 auto;
-   cursor: pointer;
-
-}
 
 
-/* CSS */
+
+/* Links */
 .link {
+    text-decoration: none;
     width: fit-content;
     margin: 0 auto;
     padding-left: 5px;
@@ -78,19 +66,17 @@
     transition-duration: .15s, .15s;
 }
 
-.link:active {
-    box-shadow: rgba(0, 0, 0, 0.15) 0 2px 4px inset, rgba(0, 0, 0, 0.4) 0 1px 1px;
+.linkToMain{
+    composes: link;
+    margin-right: 0;
+    margin-left: auto;
+    font-size: 18px;
+    padding: 10px;
+}
+.header{
+    text-align: center;
+    margin-bottom: 10px;
 }
 
-.link:disabled {
-    cursor: not-allowed;
-    opacity: .6;
-}
 
-.link:disabled:active {
-    pointer-events: none;
-}
 
-.link:disabled:hover {
-    box-shadow: none;
-}

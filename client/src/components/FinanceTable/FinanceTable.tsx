@@ -20,7 +20,7 @@ import {
   dataType,
 } from '../../utils/ts-types';
 
-import s from './FinanceTable.module.css';
+import s from './Table.module.css';
 
 export default function FinanceTable(prop: { data: tikersType[] }) {
   const { data } = prop;

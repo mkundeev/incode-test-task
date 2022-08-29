@@ -1,13 +1,15 @@
 import React from 'react';
 import Container from '@mui/material/Container';
-import TickerTable from '../components/TickerTable/TickerTable';
+import HistoryTable from '../components/HistoryTable/HistoryTable';
 import MoonLoader from 'react-spinners/MoonLoader';
 import { useGetDataForTickerQuery } from '../redux/financeAPI';
 import { useParams } from 'react-router-dom';
+import { useGetDataHistoryType } from '../utils/ts-types';
 
 export default function HistoryPage() {
   const { ticker } = useParams();
-  const { data, isLoading } = useGetDataForTickerQuery(ticker);
+  const { data, isLoading } =
+    useGetDataForTickerQuery<useGetDataHistoryType>(ticker);
 
   return (
     <Container sx={{ p: 5 }} data-testid="container">
@@ -16,7 +18,7 @@ export default function HistoryPage() {
           <MoonLoader color="#39f279" size={120} />
         </div>
       )}
-      {!isLoading && <TickerTable data={data} />}
+      {!isLoading && <HistoryTable data={data.data} />}
     </Container>
   );
 }

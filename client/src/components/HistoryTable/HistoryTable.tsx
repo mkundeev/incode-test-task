@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -8,16 +8,18 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { changeColorOnValue, dateToLocalTime } from '../../utils/data-formatin';
-import s from './TickerTable.module.css';
+import { tickersHistoryType, amountSortType } from '../../utils/ts-types';
+import s from '../FinanceTable/Table.module.css';
 
-export default function TickerTable({ data }) {
-  const [amountSort, setAmountSort] = useState({});
-  const [dataForTicker, setDataForTicker] = useState(data.data);
+export default function HistoryTable(prop: { data: tickersHistoryType[] }) {
+  const { data } = prop;
+  const [amountSort, setAmountSort] = useState<amountSortType>({});
+  const [dataForTicker, setDataForTicker] = useState(data);
 
   useEffect(() => {
-    setDataForTicker(data.data);
+    setDataForTicker(data);
   }, [data]);
-  const sortByAmount = property => {
+  const sortByAmount = (property: keyof amountSortType) => {
     let filterdData = [];
     if (!amountSort.hasOwnProperty(property)) {
       setAmountSort({ [property]: false });
@@ -38,8 +40,10 @@ export default function TickerTable({ data }) {
   };
   return (
     <>
-      <Link to={`/`}>Back to main</Link>
-      <h2>{dataForTicker[0]?.ticker}</h2>
+      <Link to={`/`} className={s.linkToMain}>
+        Back to main
+      </Link>
+      <h2 className={s.header}>{dataForTicker[0]?.ticker}</h2>
       <TableContainer component={Paper}>
         <Table
           sx={{ minWidth: 650 }}
