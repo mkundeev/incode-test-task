@@ -2,9 +2,9 @@
 
 Application display price tickers data on the UI in realtime.
 It is possible to sort price, change, change percentage, yield, dividend in ascending and descending order by clicking on the corresponding table header cell.
-After clicking on tickers cell a menu will be opened where is possible to choose which tickers to track. Filtering takes place on back-end.
+After clicking on tickers cell a menu will be opened where is possible to choose which tickers to track. Filtering by tikers takes place on back-end.
 In the last column are located buttons with links to another page where is situated table with the history of the corresponding ticker.
-(Now data is limited to 50 last records). In this table it is also possible to sort data in ascending and descending order by date.
+(Data is limited to 50 last records). In this table it is also possible to sort data in ascending and descending order by date.
 
 Used technologies:
 Client: HTML, CSS, JS, TS, React, Redux, React Router, Jest, Socket.io, MUI
