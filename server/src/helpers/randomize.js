@@ -14,10 +14,17 @@ function utcDate() {
     now.getUTCSeconds()
   );
 }
+const tickers = [
+  { AAPL: true },
+  { GOOGL: true },
+  { MSFT: true },
+  { AMZN: true },
+  { FB: true },
+  { TSLA: true },
+];
 
-function randomizeQuotes(tickers) {
+function randomizeQuotes() {
   return tickers
-    .filter(obj => Object.values(obj)[0])
     .map(ticker => {
       const price = randomValue(100, 300, 2);
       const change = randomValue(-10, 20, 2);

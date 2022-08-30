@@ -14,7 +14,6 @@ import s from '../FinanceTable/Table.module.css';
 
 export default function HistoryTable(prop: { data: tickersHistoryType[] }) {
   const { data } = prop;
-  console.log(data);
   const [amountSort, setAmountSort] = useState<amountSortType>({});
   const [dataForTicker, setDataForTicker] = useState(data);
   const [dateSort, setDateSort] = useState(true);
