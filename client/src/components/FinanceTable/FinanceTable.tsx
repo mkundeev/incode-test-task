@@ -1,30 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import Checkbox from '@mui/material/Checkbox';
-import { useSendTickersMutation } from '../../redux/financeAPI';
-import { changeColorOnValue, dateToLocalTime } from '../../utils/data-formatin';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Checkbox from "@mui/material/Checkbox";
+import { useSendTickersMutation } from "../../redux/financeAPI";
+import { changeColorOnValue, dateToLocalTime } from "../../utils/data-formatin";
 
 import {
   tikersType,
   tikersFilterType,
   amountSortType,
   dataType,
-} from '../../utils/ts-types';
+} from "../../utils/ts-types";
 
-import s from './Table.module.css';
+import s from "./Table.module.css";
 
 export default function FinanceTable(prop: { data: tikersType[] }) {
   const { data } = prop;
-  const anchorCategory = document.querySelector('#filtrTicker');
+  const anchorCategory = document.querySelector("#filtrTicker");
 
   const [sendTickers] = useSendTickersMutation();
   const [amountSort, setAmountSort] = useState<amountSortType>({});
@@ -33,10 +33,22 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
   const [isMenuTickerOpen, setIsMenuTickerOpen] = useState(false);
 
   useEffect(() => {
-    const result = localStorage.getItem('tickers');
+    const result = localStorage.getItem("tickers");
     if (result) {
       const initialFilterState: tikersFilterType = JSON.parse(result);
       setTickersFilter(initialFilterState);
+    } else {
+      localStorage.setItem(
+        "tickers",
+        JSON.stringify([
+          { AAPL: false },
+          { GOOGL: false },
+          { MSFT: false },
+          { AMZN: false },
+          { FB: false },
+          { TSLA: false },
+        ])
+      );
     }
     setTransactions(data);
   }, [data]);
@@ -60,21 +72,21 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
   const handleCheckboxChangeTickers = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const newFiltervalue = tickersFilter.map(obj => {
+    const newFiltervalue = tickersFilter.map((obj) => {
       if (obj.hasOwnProperty(event.target.name)) {
         obj[event.target.name] = event.target.checked;
         return obj;
       }
       return obj;
     });
-    localStorage.setItem('tickers', JSON.stringify(newFiltervalue));
+    localStorage.setItem("tickers", JSON.stringify(newFiltervalue));
     setTickersFilter(newFiltervalue);
   };
 
   const filterByCheckedTickers = async () => {
     setIsMenuTickerOpen(false);
     let filterTickers: tikersFilterType;
-    if (tickersFilter.filter(obj => Object.values(obj)[0]).length === 0) {
+    if (tickersFilter.filter((obj) => Object.values(obj)[0]).length === 0) {
       filterTickers = [
         { AAPL: true },
         { GOOGL: true },
@@ -100,7 +112,7 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
   };
   const handleResetTickers = async () => {
     localStorage.setItem(
-      'tickers',
+      "tickers",
       JSON.stringify([
         { AAPL: false },
         { GOOGL: false },
@@ -135,7 +147,7 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
           <TableHead>
             <TableRow className={s.headerRow}>
               <TableCell
-                sx={{ cursor: 'pointer' }}
+                sx={{ cursor: "pointer" }}
                 className={s.headerCell}
                 id="filtrTicker"
                 onClick={() => {
@@ -150,41 +162,41 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
               </TableCell>
               <TableCell
                 align="center"
-                sx={{ cursor: 'pointer' }}
+                sx={{ cursor: "pointer" }}
                 className={s.headerCell}
-                onClick={() => sortByAmount('price')}
+                onClick={() => sortByAmount("price")}
               >
                 Price
               </TableCell>
               <TableCell
                 align="center"
-                sx={{ cursor: 'pointer' }}
+                sx={{ cursor: "pointer" }}
                 className={s.headerCell}
-                onClick={() => sortByAmount('change')}
+                onClick={() => sortByAmount("change")}
               >
                 Change
               </TableCell>
               <TableCell
                 align="center"
-                sx={{ cursor: 'pointer' }}
+                sx={{ cursor: "pointer" }}
                 className={s.headerCell}
-                onClick={() => sortByAmount('change_percent')}
+                onClick={() => sortByAmount("change_percent")}
               >
                 Change persent
               </TableCell>
               <TableCell
                 align="center"
-                sx={{ cursor: 'pointer' }}
+                sx={{ cursor: "pointer" }}
                 className={s.headerCell}
-                onClick={() => sortByAmount('dividend')}
+                onClick={() => sortByAmount("dividend")}
               >
                 Devident
               </TableCell>
               <TableCell
                 align="center"
-                sx={{ cursor: 'pointer' }}
+                sx={{ cursor: "pointer" }}
                 className={s.headerCell}
-                onClick={() => sortByAmount('yield')}
+                onClick={() => sortByAmount("yield")}
               >
                 Yield
               </TableCell>
@@ -194,10 +206,10 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
             </TableRow>
           </TableHead>
           <TableBody data-testid="tableBody">
-            {transactions?.map(row => (
+            {transactions?.map((row) => (
               <TableRow
                 key={row.ticker}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 role="checkbox"
                 className={s.tableRow}
               >
@@ -239,15 +251,15 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
         open={isMenuTickerOpen}
         onClose={() => setIsMenuTickerOpen(false)}
         MenuListProps={{
-          'aria-labelledby': 'basic-button',
+          "aria-labelledby": "basic-button",
         }}
         data-testid="tickersMenu"
       >
-        {tickersFilter.map(el => (
+        {tickersFilter.map((el) => (
           <MenuItem
             key={Object.keys(el)[0]}
             id={Object.keys(el)[0]}
-            sx={{ fontSize: '12px' }}
+            sx={{ fontSize: "12px" }}
           >
             <Checkbox
               checked={Object.values(el)[0]}
@@ -260,7 +272,7 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
         <MenuItem
           onClick={filterByCheckedTickers}
           key="filter"
-          sx={{ fontSize: '14px', justifyContent: 'center' }}
+          sx={{ fontSize: "14px", justifyContent: "center" }}
           data-testid="filterBtn"
         >
           Filter
@@ -268,7 +280,7 @@ export default function FinanceTable(prop: { data: tikersType[] }) {
         <MenuItem
           onClick={handleResetTickers}
           key="reset"
-          sx={{ fontSize: '14px', justifyContent: 'center' }}
+          sx={{ fontSize: "14px", justifyContent: "center" }}
         >
           Reset
         </MenuItem>
